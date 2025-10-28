@@ -2,6 +2,11 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QGridLayout>
+#include <QSpinBox>
+#include <QPushButton>
+#include <QLineEdit>
+#include <QTextEdit>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -12,18 +17,63 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget *leftQWidget = new QWidget;
     QWidget *rightWidget = new QWidget;
     leftQWidget->setStyleSheet("background-color: #E0FFFF; border: 2px solid black;");
-    rightWidget->setStyleSheet("background-color: #F0FFF0; border: 1px solid red;");
+    rightWidget->setStyleSheet("background-color: #F0FFF0; border: 1px solid green;");
 
     QHBoxLayout *mainHLay = new QHBoxLayout;
     mainHLay->addWidget(leftQWidget,5);
     mainHLay->addWidget(rightWidget,1);
     mainWidget->setLayout(mainHLay);
 
-    //初始化右边组件
+    /*
+     * 初始化右边组件
+    */
     QVBoxLayout *rightLay = new QVBoxLayout;
+    //剩余车位数
     QLabel *spaceLeftLabel = new QLabel("剩余车位:0");
 
-    rightLay->addWidget(spaceLeftLabel);
+    //设置车位数
+    QWidget *spaceNumWidget = new QWidget;
+    QGridLayout *spaceNumGridlay = new QGridLayout;
+    QLabel *spaceNumLabel = new QLabel("设置车位数");
+    QSpinBox *spaceNumSpin = new QSpinBox;
+    QPushButton *spaceNumOkButton = new QPushButton("确认设置");
+    spaceNumSpin->setMaximum(8);
+    spaceNumSpin->setMinimum(1);
+    spaceNumGridlay->addWidget(spaceNumLabel,0,0);
+    spaceNumGridlay->addWidget(spaceNumSpin,0,1);
+    spaceNumGridlay->addWidget(spaceNumOkButton,1,0,1,2);
+    spaceNumWidget->setLayout(spaceNumGridlay);
+
+    //车辆入队
+    QWidget *carPushWidget = new QWidget;
+    QGridLayout *carPushGridLay = new QGridLayout;
+    QLabel *nowLisence = new QLabel("当前车牌:00000");
+    QPushButton *randLisenceButton = new QPushButton("随机车牌号");
+    QPushButton *pushCarButton = new QPushButton("车辆入队");
+    carPushGridLay->addWidget(nowLisence,0,0);
+    carPushGridLay->addWidget(randLisenceButton,0,1);
+    carPushGridLay->addWidget(pushCarButton,1,0,1,2);
+    carPushWidget->setLayout(carPushGridLay);
+
+    //车辆出库
+    QWidget *carPopWidget = new QWidget;
+    QVBoxLayout *carPopLay = new QVBoxLayout;
+    QLabel *carPopLabel = new QLabel("请输入出库车牌号：");
+    QLineEdit *carPopLineEdit = new QLineEdit;
+    QPushButton * carPopButton = new QPushButton("确认出库");
+    carPopLay->addWidget(carPopLabel);
+    carPopLay->addWidget(carPopLineEdit);
+    carPopLay->addWidget(carPopButton);
+    carPopWidget->setLayout(carPopLay);
+
+    //信息展示栏
+    QTextEdit *infoTextEdit = new QTextEdit;
+
+    rightLay->addWidget(spaceLeftLabel,1);
+    rightLay->addWidget(spaceNumWidget,2);
+    rightLay->addWidget(carPushWidget,2);
+    rightLay->addWidget(carPopWidget,2);
+    rightLay->addWidget(infoTextEdit,6);
     rightWidget->setLayout(rightLay);
 }
 
