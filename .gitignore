@@ -1,0 +1,25 @@
+# 操作系统和IDE相关文件
+*.user
+*.pro.user
+*.vcxproj.user
+.vscode/
+
+# 编译生成目录和文件
+debug/
+release/
+build*/
+*.o
+*.obj
+*.so
+*.dll
+*.exe
+*.a
+*.lib
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+Makefile*
+
+# Qt特有
+*.qm
+*.ts
