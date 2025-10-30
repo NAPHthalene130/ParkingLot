@@ -27,5 +27,9 @@ public:
     ~MainWindow();
 private slots:
     void spaceNumOkButton_clicked();
+
+protected:
+    //测试鼠标位置
+    void mousePressEvent(QMouseEvent *event) override;
 };
 #endif // MAINWINDOW_H

@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include "Parkingplacelabel.h"
+#include <QMouseEvent>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -35,11 +36,28 @@ MainWindow::MainWindow(QWidget *parent)
     //设置车位数
     QWidget *spaceNumWidget = new QWidget;
     QGridLayout *spaceNumGridlay = new QGridLayout;
-    QLabel *spaceNumLabel = new QLabel("设置每行车位数");
+    QLabel *spaceNumLabel = new QLabel("每行车位数:");
     spaceNumSpin = new QSpinBox;
     QPushButton *spaceNumOkButton = new QPushButton("确认设置");
+    spaceNumSpin->setValue(1);
     spaceNumSpin->setMaximum(4);
     spaceNumSpin->setMinimum(1);
+    spaceNumSpin->setStyleSheet(R"(
+        QSpinBox {
+            padding-right: 20px;
+            max-width: 80px;
+        }
+        QSpinBox::up-button {
+            subcontrol-origin: border;
+            subcontrol-position: top right;
+            width: 20px;
+        }
+        QSpinBox::down-button {
+            subcontrol-origin: border;
+            subcontrol-position: bottom right;
+            width: 20px;
+        }
+    )");
     spaceNumGridlay->addWidget(spaceNumLabel,0,0);
     spaceNumGridlay->addWidget(spaceNumSpin,0,1);
     spaceNumGridlay->addWidget(spaceNumOkButton,1,0,1,2);
@@ -138,4 +156,14 @@ void MainWindow::spaceNumOkButton_clicked()
     parkingIconPoints.clear();
     initLeft();
 
+}
+
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+    QPoint relativePos = event->pos();
+    int x = relativePos.x();
+    int y = relativePos.y();
+    qDebug() <<"Local Position"
+             << "X =" << x
+             << "Y =" << y;
 }
