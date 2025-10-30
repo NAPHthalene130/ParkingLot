@@ -15,13 +15,13 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget *mainWidget = new QWidget;
     this->setCentralWidget(mainWidget);
     this->setFixedSize(1200,800);
-    QWidget *leftQWidget = new QWidget;
+    this->leftWidget = new QWidget;
     QWidget *rightWidget = new QWidget;
-    leftQWidget->setStyleSheet("background-color: #E0FFFF; border: 2px solid black;");
+    leftWidget->setStyleSheet("background-color: #E0FFFF; border: 2px solid black;");
     rightWidget->setStyleSheet("background-color: #F0FFF0; border: 1px solid green;");
 
     QHBoxLayout *mainHLay = new QHBoxLayout;
-    mainHLay->addWidget(leftQWidget,5);
+    mainHLay->addWidget(leftWidget,5);
     mainHLay->addWidget(rightWidget,1);
     mainWidget->setLayout(mainHLay);
 
@@ -36,9 +36,9 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget *spaceNumWidget = new QWidget;
     QGridLayout *spaceNumGridlay = new QGridLayout;
     QLabel *spaceNumLabel = new QLabel("设置每行车位数");
-    QSpinBox *spaceNumSpin = new QSpinBox;
+    spaceNumSpin = new QSpinBox;
     QPushButton *spaceNumOkButton = new QPushButton("确认设置");
-    spaceNumSpin->setMaximum(8);
+    spaceNumSpin->setMaximum(4);
     spaceNumSpin->setMinimum(1);
     spaceNumGridlay->addWidget(spaceNumLabel,0,0);
     spaceNumGridlay->addWidget(spaceNumSpin,0,1);
@@ -86,10 +86,56 @@ MainWindow::MainWindow(QWidget *parent)
     /*
      * 左侧栏
      */
-    QGridLayout *leftGridLay = new QGridLayout;
+    this->leftGridLay = new QGridLayout;
+    //设置等大
+    for (int i = 0; i < 18; ++i) {
+        leftGridLay->setColumnStretch(i, 1);
+    }
+    for (int i = 0; i < 4; ++i) {
+        leftGridLay->setRowStretch(i,1);
+    }
 
+    initLeft();
+
+    /*
+     * 动作设置区
+     */
+    connect(spaceNumOkButton, &QPushButton::clicked,
+            this, &MainWindow::spaceNumOkButton_clicked);
+
+}
+
+void MainWindow::initLeft()
+{
+    QWidget *entrySeparatorWidget = new QWidget;
+    entrySeparatorWidget->setStyleSheet("background-color: black;");
+    entrySeparatorWidget->setStyleSheet("background-color: #F0FFF0; border: 1px solid green;");
+    leftGridLay->addWidget(entrySeparatorWidget, 3, 0, 1, 18);
+    leftWidget->setLayout(leftGridLay);
+    int numPerLine = spaceNumSpin->value();
+    int spaceWidth = 12/numPerLine;
+    int index = 3;
+    for (int i = 0; i < numPerLine; i++) {
+        ParkingPlaceLabel *uPLabel = new ParkingPlaceLabel;
+        ParkingPlaceLabel *dPLabel = new ParkingPlaceLabel;
+        leftGridLay->addWidget(uPLabel,0,index,1,spaceWidth);
+        leftGridLay->addWidget(dPLabel,2,index,1,spaceWidth);
+        this->parkingIconPoints.push_back(uPLabel);
+        this->parkingIconPoints.push_back(dPLabel);
+        index += spaceWidth;
+    }
 }
 
 MainWindow::~MainWindow()
 {
+}
+
+void MainWindow::spaceNumOkButton_clicked()
+{
+    for (auto p: parkingIconPoints) {
+        delete p;
+    }
+    parkingIconPoints.clear();
+    initLeft();
+
 }

@@ -11,4 +11,5 @@ ParkingPlaceLabel::ParkingPlaceLabel() {
         this->setPixmap(icon);
     }
     this->setScaledContents(true);
+    this->setMinimumSize(50, 50);
 }
