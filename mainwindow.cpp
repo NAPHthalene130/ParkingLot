@@ -44,15 +44,18 @@ MainWindow::MainWindow(QWidget *parent)
     spaceNumGridlay->addWidget(spaceNumOkButton,1,0,1,2);
     spaceNumWidget->setLayout(spaceNumGridlay);
 
-    //车辆入队
+    //车辆入队及入库
     QWidget *carPushWidget = new QWidget;
     QGridLayout *carPushGridLay = new QGridLayout;
     QLabel *nowLisence = new QLabel("当前车牌:00000");
     QPushButton *randLisenceButton = new QPushButton("随机车牌号");
     QPushButton *pushCarButton = new QPushButton("车辆入队");
+    QPushButton *queueTopButton = new QPushButton("队首入库");
+
     carPushGridLay->addWidget(nowLisence,0,0);
     carPushGridLay->addWidget(randLisenceButton,0,1);
     carPushGridLay->addWidget(pushCarButton,1,0,1,2);
+    carPushGridLay->addWidget(queueTopButton,2,0,1,2);
     carPushWidget->setLayout(carPushGridLay);
 
     //车辆出库
