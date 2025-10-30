@@ -7,6 +7,7 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QTextEdit>
+#include "Parkingplacelabel.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -34,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
     //设置车位数
     QWidget *spaceNumWidget = new QWidget;
     QGridLayout *spaceNumGridlay = new QGridLayout;
-    QLabel *spaceNumLabel = new QLabel("设置车位数");
+    QLabel *spaceNumLabel = new QLabel("设置每行车位数");
     QSpinBox *spaceNumSpin = new QSpinBox;
     QPushButton *spaceNumOkButton = new QPushButton("确认设置");
     spaceNumSpin->setMaximum(8);
@@ -64,9 +65,12 @@ MainWindow::MainWindow(QWidget *parent)
     QLabel *carPopLabel = new QLabel("请输入出库车牌号：");
     QLineEdit *carPopLineEdit = new QLineEdit;
     QPushButton * carPopButton = new QPushButton("确认出库");
+
+
     carPopLay->addWidget(carPopLabel);
     carPopLay->addWidget(carPopLineEdit);
     carPopLay->addWidget(carPopButton);
+
     carPopWidget->setLayout(carPopLay);
 
     //信息展示栏
@@ -78,6 +82,12 @@ MainWindow::MainWindow(QWidget *parent)
     rightLay->addWidget(carPopWidget,2);
     rightLay->addWidget(infoTextEdit,6);
     rightWidget->setLayout(rightLay);
+
+    /*
+     * 左侧栏
+     */
+    QGridLayout *leftGridLay = new QGridLayout;
+
 }
 
 MainWindow::~MainWindow()
