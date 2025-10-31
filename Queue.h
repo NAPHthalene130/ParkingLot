@@ -18,7 +18,7 @@ public:
         beginNode->nextNode = nullptr;
         frontNode = beginNode;
         railNode = beginNode;
-        int size = 0;
+        queueSize = 0;
     }
     ~Queue()
     {
@@ -50,6 +50,9 @@ public:
             queueSize--;
             return value;
         }
+    }
+    int size() {
+        return queueSize;
     }
 };
 #endif // QUEUE_H

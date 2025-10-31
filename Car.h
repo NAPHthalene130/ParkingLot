@@ -8,7 +8,9 @@
 class Car : public QLabel
 {
 public:
+    QString carnum;
     Car();
+    QMovie *movie;
 };
 
 #endif // CAR_H

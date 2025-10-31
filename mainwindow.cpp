@@ -11,6 +11,9 @@
 #include <QMouseEvent>
 #include <QPropertyAnimation>
 #include "Car.h"
+#include <iostream>
+#include <QMovie>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -68,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget *carPushWidget = new QWidget;
     QGridLayout *carPushGridLay = new QGridLayout;
     QLabel *nowLisence = new QLabel("当前车牌:00000");
+    nowCarnum = "00000";
     QPushButton *randLisenceButton = new QPushButton("随机车牌号");
     QPushButton *pushCarButton = new QPushButton("车辆入队");
     QPushButton *queueTopButton = new QPushButton("队首入库");
@@ -127,14 +131,16 @@ MainWindow::MainWindow(QWidget *parent)
     initLeft();
 
 
-    Car *myCar = new Car;
-    myCar->move(50,50);
-    myCar->setParent(leftWidget);
+    // Car *myCar = new Car;
+    // myCar->move(50,50);
+    // myCar->setParent(leftWidget);
     /*
      * 动作设置区
      */
     connect(spaceNumOkButton, &QPushButton::clicked,
             this, &MainWindow::spaceNumOkButton_clicked);
+    connect(pushCarButton, &QPushButton::clicked,
+            this, &MainWindow::pushCarButton_clicked);
 
 }
 
@@ -167,6 +173,29 @@ void MainWindow::spaceNumOkButton_clicked()
     parkingIconPoints.clear();
     initLeft();
 
+}
+
+void MainWindow::pushCarButton_clicked()
+{
+    using std::cout;
+    using std::endl;
+    cout << "pushCarButton_Clicked" << endl;
+    if ((carnumQueueHave.find(nowCarnum) == carnumQueueHave.end()) && (carnumParkingHave.find(nowCarnum) == carnumParkingHave.end())) { //车牌不在库内及队内
+        if (this->carQueue.size() >= 4) { //队满
+
+        } else {
+            cout << 1 << endl;
+            Car *newCar = new Car;
+            newCar->setParent(leftWidget);
+            newCar->carnum = nowCarnum;
+            carnumQueueHave.insert(nowCarnum);
+            carQueue.push(newCar);
+            newCar->move(120,600);
+            newCar->show();
+        }
+    } else { //车牌在库内或队内
+
+    }
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)

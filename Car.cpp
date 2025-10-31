@@ -9,11 +9,14 @@
 Car::Car(){
     using std::cout;
     using std::endl;
-    QMovie *movie = new QMovie(":/images/carGif.gif");
+    movie = new QMovie(":/images/carGif.gif");
     if (movie->isValid()) {
         this->setMovie(movie);
         movie->start();
+        this->setStyleSheet("border: none;");
     } else {
         cout << "WARN: set gif failed" << endl;
     }
+    this->setFixedSize(120,150);
+    this->setScaledContents(true);
 }

@@ -12,6 +12,9 @@
 #include <QTextEdit>
 #include <vector>
 #include "Parkingplacelabel.h"
+#include "Queue.h"
+#include "Car.h"
+#include <set>
 
 class MainWindow : public QMainWindow
 {
@@ -22,11 +25,16 @@ private:
     QSpinBox *spaceNumSpin = new QSpinBox;
     void initLeft();
     std::vector<ParkingPlaceLabel*> parkingIconPoints;
+    Queue<Car*> carQueue;
+    std::set<QString> carnumQueueHave;
+    std::set<QString> carnumParkingHave;
+    QString nowCarnum;
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 private slots:
     void spaceNumOkButton_clicked();
+    void pushCarButton_clicked();
 
 protected:
     //测试鼠标位置
