@@ -5,12 +5,16 @@
 #include <QPoint>
 #include <qlabel.h>
 
-class Car : public QLabel
+class Car : public QWidget
 {
 public:
     QString carnum;
-    Car();
+    Car(QString);
+    ~Car();
     QMovie *movie;
+private:
+    QLabel *carNumLabel;
+    QLabel *carGifLabel;
 };
 
 #endif // CAR_H

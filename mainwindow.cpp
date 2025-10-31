@@ -13,6 +13,11 @@
 #include "Car.h"
 #include <iostream>
 #include <QMovie>
+#include <QRandomGenerator>
+#include <QDateTime>
+#include <cstdlib>
+#include <ctime>
+#include <QtGlobal>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -70,7 +75,7 @@ MainWindow::MainWindow(QWidget *parent)
     //车辆入队及入库
     QWidget *carPushWidget = new QWidget;
     QGridLayout *carPushGridLay = new QGridLayout;
-    QLabel *nowLisence = new QLabel("当前车牌:00000");
+    this->nowLisence = new QLabel("当前车牌:00000");
     nowCarnum = "00000";
     QPushButton *randLisenceButton = new QPushButton("随机车牌号");
     QPushButton *pushCarButton = new QPushButton("车辆入队");
@@ -141,6 +146,8 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::spaceNumOkButton_clicked);
     connect(pushCarButton, &QPushButton::clicked,
             this, &MainWindow::pushCarButton_clicked);
+    connect(randLisenceButton, &QPushButton::clicked,
+            this, &MainWindow::randLisenceButton_clicked);
 
 }
 
@@ -171,6 +178,10 @@ void MainWindow::spaceNumOkButton_clicked()
         delete p;
     }
     parkingIconPoints.clear();
+    carnumParkingHave.clear();
+    carnumQueueHave.clear();
+    carQueue.clear();
+
     initLeft();
 
 }
@@ -185,17 +196,41 @@ void MainWindow::pushCarButton_clicked()
 
         } else {
             cout << 1 << endl;
-            Car *newCar = new Car;
+            Car *newCar = new Car(nowCarnum);
             newCar->setParent(leftWidget);
             newCar->carnum = nowCarnum;
             carnumQueueHave.insert(nowCarnum);
             carQueue.push(newCar);
-            newCar->move(120,600);
+            newCar->move(20,600);
             newCar->show();
+            QPropertyAnimation *animation = new QPropertyAnimation(newCar, "pos");
+            animation->setDuration(1000);
+            animation->setStartValue(QPoint(20, 600));
+            animation->setEndValue(QPoint(850 - 150*carQueue.size(), 600));
+            animation->start();
         }
     } else { //车牌在库内或队内
 
     }
+}
+
+void MainWindow::randLisenceButton_clicked()
+{
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+    QString str = "";
+    bool flag = true;
+    while (flag) {
+        str = "";
+        for (int i = 0 ; i < 5; i++) {
+            int num = std::rand()%10;
+            str += QString::number(num);
+        }
+        if ((carnumParkingHave.find(str) == carnumParkingHave.end()) && (carnumQueueHave.find(str) == carnumQueueHave.end())) {
+            flag = false;
+        }
+    }
+    nowCarnum = str;
+    nowLisence->setText("当前车牌号:"+str);
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
