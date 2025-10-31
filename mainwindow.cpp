@@ -9,7 +9,8 @@
 #include <QTextEdit>
 #include "Parkingplacelabel.h"
 #include <QMouseEvent>
-
+#include <QPropertyAnimation>
+#include "Car.h"
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -112,9 +113,23 @@ MainWindow::MainWindow(QWidget *parent)
     for (int i = 0; i < 4; ++i) {
         leftGridLay->setRowStretch(i,1);
     }
-
+    QWidget *entrySeparatorWidget = new QWidget;
+    entrySeparatorWidget->setStyleSheet("background-color: black;");
+    entrySeparatorWidget->setStyleSheet("background-color: #F0FFF0; border: 1px solid green;");
+    leftGridLay->addWidget(entrySeparatorWidget, 3, 0, 1, 18);
+    QLabel *outLabel = new QLabel("出\n口");
+    outLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    QFont outFont = outLabel->font();
+    outFont.setBold(true);
+    outFont.setPointSize(48);
+    outLabel->setFont(outFont);
+    leftGridLay->addWidget(outLabel,0,0,3,3);
     initLeft();
 
+
+    Car *myCar = new Car;
+    myCar->move(50,50);
+    myCar->setParent(leftWidget);
     /*
      * 动作设置区
      */
@@ -125,10 +140,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::initLeft()
 {
-    QWidget *entrySeparatorWidget = new QWidget;
-    entrySeparatorWidget->setStyleSheet("background-color: black;");
-    entrySeparatorWidget->setStyleSheet("background-color: #F0FFF0; border: 1px solid green;");
-    leftGridLay->addWidget(entrySeparatorWidget, 3, 0, 1, 18);
     leftWidget->setLayout(leftGridLay);
     int numPerLine = spaceNumSpin->value();
     int spaceWidth = 12/numPerLine;

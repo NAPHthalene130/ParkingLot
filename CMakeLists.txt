@@ -26,6 +26,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Node.h Node.cpp
         imgSrc.qrc
         Parkingplacelabel.h Parkingplacelabel.cpp
+        Car.h Car.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Parking APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
