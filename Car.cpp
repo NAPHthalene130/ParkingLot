@@ -35,6 +35,7 @@ Car::Car(QString num){
 
 Car::~Car()
 {
+    std::cout << "DELETE CAR" << std::endl;
     if (carGifLabel != nullptr) {
         delete carGifLabel;
     }
