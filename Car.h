@@ -12,7 +12,7 @@ public:
     Car(QString);
     ~Car();
     QMovie *movie;
-    void leaveParking();
+    void leaveParking(QWidget* widget);
 private:
     QLabel *carNumLabel;
     QLabel *carGifLabel;

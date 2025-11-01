@@ -6,11 +6,13 @@
 #include <iostream>
 #include <QMovie>
 #include <QVBoxLayout>
+#include <QSequentialAnimationGroup>
 
 Car::Car(QString num){
     using std::cout;
     using std::endl;
     movie = new QMovie(":/images/carGif.gif");
+    carnum = num;
     if (movie->isValid()) {
         this->carGifLabel = new QLabel;
         this->carNumLabel = new QLabel;
@@ -42,4 +44,25 @@ Car::~Car()
     if (carNumLabel != nullptr) {
         delete carNumLabel;
     }
+}
+
+void Car::leaveParking(QWidget* widget)
+{
+
+    QSequentialAnimationGroup *group = new QSequentialAnimationGroup(widget);
+    QPropertyAnimation *animAB = new QPropertyAnimation(this, "pos");
+    animAB->setDuration(300);
+    animAB->setStartValue(this->pos());
+    QPoint p = this->pos();
+    p.setY(200);
+    animAB->setEndValue(p);
+    group->addAnimation(animAB);
+    QPropertyAnimation *animBC = new QPropertyAnimation(this, "pos");
+    animBC->setDuration(p.x());
+    animBC->setStartValue(p);
+    animBC->setEndValue(QPoint(0, 200));
+    group->addAnimation(animBC);
+    QObject::connect(animBC, &QPropertyAnimation::finished,
+                     this, &QWidget::deleteLater);
+    group->start();
 }

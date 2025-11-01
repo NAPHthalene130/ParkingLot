@@ -33,6 +33,8 @@ private:
     int parkingSpareSpace = 2;
     int parkingAllSpace = 2;
     std::vector<Car*> spaceState;
+    QLineEdit *carPopLineEdit;
+    QLabel *spaceLeftLabel = new QLabel("剩余车位:0");
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -41,6 +43,7 @@ private slots:
     void pushCarButton_clicked();
     void randLisenceButton_clicked();
     void queueTopButton_clicked();
+    void carPopButton_clicked();
 protected:
     //测试鼠标位置
     void mousePressEvent(QMouseEvent *event) override;

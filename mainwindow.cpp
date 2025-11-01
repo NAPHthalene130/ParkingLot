@@ -43,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
     */
     QVBoxLayout *rightLay = new QVBoxLayout;
     //剩余车位数
-    QLabel *spaceLeftLabel = new QLabel("剩余车位:0");
+    this->spaceLeftLabel = new QLabel("剩余车位:0");
 
     //设置车位数
     QWidget *spaceNumWidget = new QWidget;
@@ -94,8 +94,8 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget *carPopWidget = new QWidget;
     QVBoxLayout *carPopLay = new QVBoxLayout;
     QLabel *carPopLabel = new QLabel("请输入出库车牌号：");
-    QLineEdit *carPopLineEdit = new QLineEdit;
-    QPushButton * carPopButton = new QPushButton("确认出库");
+    this->carPopLineEdit = new QLineEdit;
+    QPushButton* carPopButton = new QPushButton("确认出库");
 
 
     carPopLay->addWidget(carPopLabel);
@@ -136,12 +136,13 @@ MainWindow::MainWindow(QWidget *parent)
     outFont.setPointSize(48);
     outLabel->setFont(outFont);
     leftGridLay->addWidget(outLabel,0,0,3,3);
+    spaceState.assign(8,nullptr);
     initLeft();
-
 
     // Car *myCar = new Car;
     // myCar->move(50,50);
     // myCar->setParent(leftWidget);
+
     /*
      * 动作设置区
      */
@@ -153,6 +154,8 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::randLisenceButton_clicked);
     connect(queueTopButton, &QPushButton::clicked,
             this, &MainWindow::queueTopButton_clicked);
+    connect(carPopButton, &QPushButton::clicked,
+            this, &MainWindow::carPopButton_clicked);
 
 }
 
@@ -173,7 +176,14 @@ void MainWindow::initLeft()
         this->parkingIconPoints.push_back(dPLabel);
         index += spaceWidth;
     }
+    for (int i = 0 ; i < 8; i++) {
+        if (spaceState[i] != nullptr) {
+            delete spaceState[i];
+            spaceState[i] = nullptr;
+        }
+    }
     spaceState.assign(8,nullptr);
+    spaceLeftLabel->setText("剩余车位:"+ QString::number(parkingSpareSpace));
 }
 
 MainWindow::~MainWindow()
@@ -237,7 +247,7 @@ void MainWindow::randLisenceButton_clicked()
         }
     }
     nowCarnum = str;
-    nowLisence->setText("当前车牌号:"+str);
+    nowLisence->setText("当前车牌:"+str);
 }
 
 void MainWindow::queueTopButton_clicked()
@@ -288,7 +298,7 @@ void MainWindow::queueTopButton_clicked()
         animBC->setEndValue(QPoint(820, 200));
         group->addAnimation(animBC);
         QPropertyAnimation *animCD = new QPropertyAnimation(queueTop, "pos");
-        animCD->setDuration(500);
+        animCD->setDuration((820-xPos));
         animCD->setStartValue(QPoint(820,200));
         animCD->setEndValue(QPoint(xPos, 200));
         group->addAnimation(animCD);
@@ -300,6 +310,26 @@ void MainWindow::queueTopButton_clicked()
         group->start();
         spaceState[target] = newCar;
         parkingSpareSpace--;
+        spaceLeftLabel->setText("剩余车位:"+ QString::number(parkingSpareSpace));
+    }
+}
+
+void MainWindow::carPopButton_clicked()
+{
+    using std::cout;
+    using std::endl;
+    QString num = carPopLineEdit->text();
+    cout << "carPopButtonClicked: Num: " << num.toStdString() << endl;
+    for (int i = 0; i < parkingAllSpace; i++) {
+        if (spaceState[i] != nullptr ) {
+            cout << "state[" << i << "] Num: " << spaceState[i]->carnum.toStdString() << endl;
+        }
+        if (spaceState[i] != nullptr && spaceState[i]->carnum == num) {
+            spaceState[i]->leaveParking(leftWidget);
+            spaceState[i] = nullptr;
+            parkingSpareSpace++;
+            spaceLeftLabel->setText("剩余车位:"+ QString::number(parkingSpareSpace));
+        }
     }
 }
 
