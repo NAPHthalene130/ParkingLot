@@ -30,6 +30,9 @@ private:
     std::set<QString> carnumParkingHave;
     QString nowCarnum;
     QLabel *nowLisence;
+    int parkingSpareSpace = 2;
+    int parkingAllSpace = 2;
+    std::vector<Car*> spaceState;
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -37,6 +40,7 @@ private slots:
     void spaceNumOkButton_clicked();
     void pushCarButton_clicked();
     void randLisenceButton_clicked();
+    void queueTopButton_clicked();
 protected:
     //测试鼠标位置
     void mousePressEvent(QMouseEvent *event) override;

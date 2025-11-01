@@ -18,6 +18,9 @@
 #include <cstdlib>
 #include <ctime>
 #include <QtGlobal>
+#include <vector>
+#include <QPoint>
+#include <QSequentialAnimationGroup>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -148,6 +151,8 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::pushCarButton_clicked);
     connect(randLisenceButton, &QPushButton::clicked,
             this, &MainWindow::randLisenceButton_clicked);
+    connect(queueTopButton, &QPushButton::clicked,
+            this, &MainWindow::queueTopButton_clicked);
 
 }
 
@@ -155,6 +160,8 @@ void MainWindow::initLeft()
 {
     leftWidget->setLayout(leftGridLay);
     int numPerLine = spaceNumSpin->value();
+    parkingSpareSpace = 2 * numPerLine;
+    parkingAllSpace = 2 * numPerLine;
     int spaceWidth = 12/numPerLine;
     int index = 3;
     for (int i = 0; i < numPerLine; i++) {
@@ -166,6 +173,7 @@ void MainWindow::initLeft()
         this->parkingIconPoints.push_back(dPLabel);
         index += spaceWidth;
     }
+    spaceState.assign(8,nullptr);
 }
 
 MainWindow::~MainWindow()
@@ -181,7 +189,6 @@ void MainWindow::spaceNumOkButton_clicked()
     carnumParkingHave.clear();
     carnumQueueHave.clear();
     carQueue.clear();
-
     initLeft();
 
 }
@@ -231,6 +238,69 @@ void MainWindow::randLisenceButton_clicked()
     }
     nowCarnum = str;
     nowLisence->setText("当前车牌号:"+str);
+}
+
+void MainWindow::queueTopButton_clicked()
+{
+    using std::cout;
+    using std::endl;
+    if (carQueue.size() > 0 && parkingSpareSpace > 0) {
+        cout << "TEST2" << endl;
+        Car *queueTop = carQueue.getTop();
+        QString num = queueTop->carnum;
+        Car *newCar = new Car(num);
+        newCar->setParent(leftWidget);
+        newCar->move(queueTop->pos());
+        newCar->show();
+        carQueue.pop();
+        queueTop = newCar;
+        int target = 0;
+        for (int i = 0; i < parkingAllSpace; i++) {
+            if (spaceState[i] == nullptr) {
+                target = i;
+                break;
+            }
+        }
+        int yPos = (target%2==0) ? 20:400;
+        int spaceWidth = (810-170) / (parkingAllSpace/2);
+        int xPos = 810 - spaceWidth * (target/2) - spaceWidth/2 - 60;
+        QSequentialAnimationGroup *group = new QSequentialAnimationGroup(leftWidget);
+        Node<Car*>* nowNode = carQueue.getFrontIt();
+        while (carQueue.size() > 0 && nowNode != nullptr) {
+            QPropertyAnimation *ani = new QPropertyAnimation(nowNode->value, "pos");
+            ani->setDuration(500);
+            QPoint p = nowNode->value->pos();
+            ani->setStartValue(p);
+            p.setX(p.x()+150);
+            ani->setEndValue(p);
+            ani->setEasingCurve(QEasingCurve::OutQuad);
+            ani->start();
+            nowNode = nowNode->nextNode;
+        }
+        QPropertyAnimation *animAB = new QPropertyAnimation(queueTop, "pos");
+        animAB->setDuration(300);
+        animAB->setStartValue(queueTop->pos());
+        animAB->setEndValue(QPoint(820, 600));
+        group->addAnimation(animAB);
+        QPropertyAnimation *animBC = new QPropertyAnimation(queueTop, "pos");
+        animBC->setDuration(500);
+        animBC->setStartValue(QPoint(820,600));
+        animBC->setEndValue(QPoint(820, 200));
+        group->addAnimation(animBC);
+        QPropertyAnimation *animCD = new QPropertyAnimation(queueTop, "pos");
+        animCD->setDuration(500);
+        animCD->setStartValue(QPoint(820,200));
+        animCD->setEndValue(QPoint(xPos, 200));
+        group->addAnimation(animCD);
+        QPropertyAnimation *animDE = new QPropertyAnimation(queueTop, "pos");
+        animDE->setDuration(500);
+        animDE->setStartValue(QPoint(xPos,200));
+        animDE->setEndValue(QPoint(xPos, yPos));
+        group->addAnimation(animDE);
+        group->start();
+        spaceState[target] = newCar;
+        parkingSpareSpace--;
+    }
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)

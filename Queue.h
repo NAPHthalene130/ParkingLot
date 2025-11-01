@@ -83,5 +83,11 @@ public:
             pop();
         }
     }
+    T getTop() {
+        return frontNode->value;
+    }
+    Node<T>* getFrontIt() {
+        return frontNode;
+    }
 };
 #endif // QUEUE_H
