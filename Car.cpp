@@ -7,6 +7,9 @@
 #include <QMovie>
 #include <QVBoxLayout>
 #include <QSequentialAnimationGroup>
+#include <chrono>
+#include <iomanip>
+#include <ctime>
 
 Car::Car(QString num){
     using std::cout;

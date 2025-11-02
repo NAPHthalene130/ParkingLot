@@ -21,6 +21,9 @@
 #include <vector>
 #include <QPoint>
 #include <QSequentialAnimationGroup>
+#include <chrono>
+#include <ctime>
+#include <QDateTime>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -105,7 +108,8 @@ MainWindow::MainWindow(QWidget *parent)
     carPopWidget->setLayout(carPopLay);
 
     //信息展示栏
-    QTextEdit *infoTextEdit = new QTextEdit;
+    this->infoTextEdit = new QTextEdit;
+    infoTextEdit->setReadOnly(true);
 
     rightLay->addWidget(spaceLeftLabel,1);
     rightLay->addWidget(spaceNumWidget,2);
@@ -159,6 +163,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 }
 
+//车位排布设置
 void MainWindow::initLeft()
 {
     leftWidget->setLayout(leftGridLay);
@@ -184,12 +189,14 @@ void MainWindow::initLeft()
     }
     spaceState.assign(8,nullptr);
     spaceLeftLabel->setText("剩余车位:"+ QString::number(parkingSpareSpace));
+    infoTextEdit->setText("车位设置成功！\n当前共"+ QString::number(numPerLine*2) + "个车位");
 }
 
 MainWindow::~MainWindow()
 {
 }
 
+//设置车位数
 void MainWindow::spaceNumOkButton_clicked()
 {
     for (auto p: parkingIconPoints) {
@@ -203,6 +210,7 @@ void MainWindow::spaceNumOkButton_clicked()
 
 }
 
+//新车辆入队
 void MainWindow::pushCarButton_clicked()
 {
     using std::cout;
@@ -210,7 +218,7 @@ void MainWindow::pushCarButton_clicked()
     cout << "pushCarButton_Clicked" << endl;
     if ((carnumQueueHave.find(nowCarnum) == carnumQueueHave.end()) && (carnumParkingHave.find(nowCarnum) == carnumParkingHave.end())) { //车牌不在库内及队内
         if (this->carQueue.size() >= 4) { //队满
-
+            infoTextEdit->setText("等待位数已满！");
         } else {
             cout << 1 << endl;
             Car *newCar = new Car(nowCarnum);
@@ -227,10 +235,11 @@ void MainWindow::pushCarButton_clicked()
             animation->start();
         }
     } else { //车牌在库内或队内
-
+        infoTextEdit->setText("车辆已存在！");
     }
 }
 
+//生成随机车牌
 void MainWindow::randLisenceButton_clicked()
 {
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -250,6 +259,7 @@ void MainWindow::randLisenceButton_clicked()
     nowLisence->setText("当前车牌:"+str);
 }
 
+//队首入车库
 void MainWindow::queueTopButton_clicked()
 {
     using std::cout;
@@ -259,6 +269,8 @@ void MainWindow::queueTopButton_clicked()
         Car *queueTop = carQueue.getTop();
         QString num = queueTop->carnum;
         Car *newCar = new Car(num);
+        carnumQueueHave.erase(num);
+        carnumParkingHave.insert(num);
         newCar->setParent(leftWidget);
         newCar->move(queueTop->pos());
         newCar->show();
@@ -310,10 +322,13 @@ void MainWindow::queueTopButton_clicked()
         group->start();
         spaceState[target] = newCar;
         parkingSpareSpace--;
+        newCar->entryTime = QDateTime::currentDateTime();
         spaceLeftLabel->setText("剩余车位:"+ QString::number(parkingSpareSpace));
+        infoTextEdit->setText("车牌号:" + newCar->carnum + "入库成功\n" + "入库时间" + newCar->entryTime.toString("yyyy/MM/dd hh:mm:ss"));
     }
 }
 
+//车辆出库
 void MainWindow::carPopButton_clicked()
 {
     using std::cout;
@@ -326,9 +341,26 @@ void MainWindow::carPopButton_clicked()
         }
         if (spaceState[i] != nullptr && spaceState[i]->carnum == num) {
             spaceState[i]->leaveParking(leftWidget);
-            spaceState[i] = nullptr;
             parkingSpareSpace++;
             spaceLeftLabel->setText("剩余车位:"+ QString::number(parkingSpareSpace));
+            carnumParkingHave.erase(num);
+
+            QDateTime exitTime = QDateTime::currentDateTime();
+            QString text = "车牌号:" + spaceState[i]->carnum + "\n";
+            text += "入库时间:" + spaceState[i]->entryTime.toString("yyyy/MM/dd hh:mm:ss") + '\n';
+            text += "出库时间" + exitTime.toString("yyyy/MM/dd hh:mm:ss") + '\n';\
+            qint64 totalSeconds = spaceState[i]->entryTime.secsTo(exitTime);
+            text += "计费规则：￥1/秒\n";
+            text += "停车共计费:￥" + QString::number(totalSeconds) + "\n";
+            qint64 hour = totalSeconds / 3600;
+            totalSeconds %= 3600;
+            qint64 minute = totalSeconds / 60;
+            totalSeconds %= 60;
+            qint64 second = totalSeconds;
+            text += "停车时长:" + QString::number(hour) + "时" + QString::number(minute) + "分" + QString::number(second) + "秒\n";
+            infoTextEdit->setText(text);
+
+            spaceState[i] = nullptr;
         }
     }
 }

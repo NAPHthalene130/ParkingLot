@@ -34,7 +34,8 @@ private:
     int parkingAllSpace = 2;
     std::vector<Car*> spaceState;
     QLineEdit *carPopLineEdit;
-    QLabel *spaceLeftLabel = new QLabel("剩余车位:0");
+    QLabel *spaceLeftLabel = new QLabel("剩余车位:2");
+    QTextEdit *infoTextEdit;
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
