@@ -15,6 +15,7 @@ public:
     QMovie *movie;
     void leaveParking(QWidget* widget);
     QDateTime entryTime;
+    int index = 0;
 private:
     QLabel *carNumLabel;
     QLabel *carGifLabel;

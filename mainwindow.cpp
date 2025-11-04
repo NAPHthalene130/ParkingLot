@@ -228,6 +228,7 @@ void MainWindow::pushCarButton_clicked()
             carQueue.push(newCar);
             newCar->move(20,600);
             newCar->show();
+            newCar->index = carQueue.size();
             QPropertyAnimation *animation = new QPropertyAnimation(newCar, "pos");
             animation->setDuration(1000);
             animation->setStartValue(QPoint(20, 600));
@@ -288,17 +289,20 @@ void MainWindow::queueTopButton_clicked()
         int xPos = 810 - spaceWidth * (target/2) - spaceWidth/2 - 60;
         QSequentialAnimationGroup *group = new QSequentialAnimationGroup(leftWidget);
         Node<Car*>* nowNode = carQueue.getFrontIt();
+        //队内车辆前移
         while (carQueue.size() > 0 && nowNode != nullptr) {
             QPropertyAnimation *ani = new QPropertyAnimation(nowNode->value, "pos");
             ani->setDuration(500);
             QPoint p = nowNode->value->pos();
             ani->setStartValue(p);
-            p.setX(p.x()+150);
+            nowNode->value->index--;
+            p.setX(850 - 150 * nowNode->value->index);
             ani->setEndValue(p);
             ani->setEasingCurve(QEasingCurve::OutQuad);
             ani->start();
             nowNode = nowNode->nextNode;
         }
+        //队首动画
         QPropertyAnimation *animAB = new QPropertyAnimation(queueTop, "pos");
         animAB->setDuration(300);
         animAB->setStartValue(queueTop->pos());
