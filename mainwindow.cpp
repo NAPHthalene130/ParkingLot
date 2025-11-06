@@ -21,7 +21,6 @@
 #include <vector>
 #include <QPoint>
 #include <QSequentialAnimationGroup>
-#include <chrono>
 #include <ctime>
 #include <QDateTime>
 
@@ -110,6 +109,7 @@ MainWindow::MainWindow(QWidget *parent)
     //信息展示栏
     this->infoTextEdit = new QTextEdit;
     infoTextEdit->setReadOnly(true);
+    infoTextEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
     rightLay->addWidget(spaceLeftLabel,1);
     rightLay->addWidget(spaceNumWidget,2);
@@ -188,8 +188,9 @@ void MainWindow::initLeft()
         }
     }
     spaceState.assign(8,nullptr);
+    infoTextEdit->append("\n===============\n");
     spaceLeftLabel->setText("剩余车位:"+ QString::number(parkingSpareSpace));
-    infoTextEdit->setText("车位设置成功！\n当前共"+ QString::number(numPerLine*2) + "个车位");
+    infoTextEdit->append("车位设置成功！\n当前共"+ QString::number(numPerLine*2) + "个车位\n");
 }
 
 MainWindow::~MainWindow()
@@ -218,7 +219,8 @@ void MainWindow::pushCarButton_clicked()
     cout << "pushCarButton_Clicked" << endl;
     if ((carnumQueueHave.find(nowCarnum) == carnumQueueHave.end()) && (carnumParkingHave.find(nowCarnum) == carnumParkingHave.end())) { //车牌不在库内及队内
         if (this->carQueue.size() >= 4) { //队满
-            infoTextEdit->setText("等待位数已满！");
+            infoTextEdit->append("\n===============\n");
+            infoTextEdit->append("等待位数已满！");
         } else {
             cout << 1 << endl;
             Car *newCar = new Car(nowCarnum);
@@ -235,22 +237,27 @@ void MainWindow::pushCarButton_clicked()
             animation->setEndValue(QPoint(850 - 150*carQueue.size(), 600));
             animation->start();
             randLisenceButton_clicked();
+            QObject::connect(animation, &QPropertyAnimation::finished,this,  [=]() {
+                if (carQueue.size() > 0) {
+                    queueTopButton_clicked();
+                }
+            });
         }
     } else { //车牌在库内或队内
-        infoTextEdit->setText("车辆已存在！");
+        infoTextEdit->append("\n===============\n");
+        infoTextEdit->append(infoTextEdit->toPlainText()+"车辆已存在\n");
     }
 }
 
 //生成随机车牌
 void MainWindow::randLisenceButton_clicked()
 {
-    std::srand(static_cast<unsigned int>(std::time(nullptr)));
     QString str = "";
     bool flag = true;
     while (flag) {
         str = "";
         for (int i = 0 ; i < 5; i++) {
-            int num = std::rand()%10;
+            quint32 num = QRandomGenerator::global()->bounded(10);
             str += QString::number(num);
         }
         if ((carnumParkingHave.find(str) == carnumParkingHave.end()) && (carnumQueueHave.find(str) == carnumQueueHave.end())) {
@@ -329,7 +336,13 @@ void MainWindow::queueTopButton_clicked()
         parkingSpareSpace--;
         newCar->entryTime = QDateTime::currentDateTime();
         spaceLeftLabel->setText("剩余车位:"+ QString::number(parkingSpareSpace));
-        infoTextEdit->setText("车牌号:" + newCar->carnum + "入库成功\n" + "入库时间" + newCar->entryTime.toString("yyyy/MM/dd hh:mm:ss"));
+        infoTextEdit->append("\n===============\n");
+        infoTextEdit->append("车牌号:" + newCar->carnum + "入库成功\n" + "入库时间" + newCar->entryTime.toString("yyyy/MM/dd hh:mm:ss") + "\n");
+        QObject::connect(group, &QSequentialAnimationGroup::finished,this,  [=]() {
+            if (carQueue.size() > 0) {
+                queueTopButton_clicked();
+            }
+        });
     }
 }
 
@@ -363,9 +376,12 @@ void MainWindow::carPopButton_clicked()
             totalSeconds %= 60;
             qint64 second = totalSeconds;
             text += "停车时长:" + QString::number(hour) + "时" + QString::number(minute) + "分" + QString::number(second) + "秒\n";
-            infoTextEdit->setText(text);
-
+            infoTextEdit->append("\n===============\n");
+            infoTextEdit->append(text);
             spaceState[i] = nullptr;
+            if (carQueue.size() > 0) {
+                queueTopButton_clicked();
+            }
         }
     }
 }
