@@ -234,6 +234,7 @@ void MainWindow::pushCarButton_clicked()
             animation->setStartValue(QPoint(20, 600));
             animation->setEndValue(QPoint(850 - 150*carQueue.size(), 600));
             animation->start();
+            randLisenceButton_clicked();
         }
     } else { //车牌在库内或队内
         infoTextEdit->setText("车辆已存在！");
