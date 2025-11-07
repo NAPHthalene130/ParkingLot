@@ -107,6 +107,38 @@ MainWindow::MainWindow(QWidget *parent)
 
     carPopWidget->setLayout(carPopLay);
 
+    //信息查询
+    QWidget *queryWidget = new QWidget;
+    QGridLayout *queryGridLay = new QGridLayout;
+    queryNumSpinBox = new QSpinBox;
+    queryNumSpinBox->setValue(1);
+    queryNumSpinBox->setMaximum(8);
+    queryNumSpinBox->setMinimum(1);
+    queryNumSpinBox->setStyleSheet(R"(
+        QSpinBox {
+            padding-right: 20px;
+            max-width: 80px;
+        }
+        QSpinBox::up-button {
+            subcontrol-origin: border;
+            subcontrol-position: top right;
+            width: 20px;
+        }
+        QSpinBox::down-button {
+            subcontrol-origin: border;
+            subcontrol-position: bottom right;
+            width: 20px;
+        }
+    )");
+    querySpaceButton = new QPushButton("查询车位信息");
+    queryNumButton = new QPushButton("查询车辆信息");
+    queryTextEdit = new QLineEdit;
+    queryGridLay->addWidget(queryNumSpinBox,0,0);
+    queryGridLay->addWidget(querySpaceButton,0,1);
+    queryGridLay->addWidget(queryTextEdit,1,0);
+    queryGridLay->addWidget(queryNumButton,1,1);
+    queryWidget->setLayout(queryGridLay);
+
     //信息展示栏
     this->infoTextEdit = new QTextEdit;
     infoTextEdit->setReadOnly(true);
@@ -116,6 +148,7 @@ MainWindow::MainWindow(QWidget *parent)
     rightLay->addWidget(spaceNumWidget,2);
     rightLay->addWidget(carPushWidget,2);
     rightLay->addWidget(carPopWidget,2);
+    rightLay->addWidget(queryWidget,2);
     rightLay->addWidget(infoTextEdit,6);
     rightWidget->setLayout(rightLay);
 
@@ -161,6 +194,10 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::queueTopButton_clicked);
     connect(carPopButton, &QPushButton::clicked,
             this, &MainWindow::carPopButton_clicked);
+    connect(queryNumButton, &QPushButton::clicked,
+            this, &MainWindow::queryNumButton_clicked);
+    connect(querySpaceButton, &QPushButton::clicked,
+            this, &MainWindow::querySpaceButton_clicked);
 
 }
 
@@ -403,6 +440,66 @@ void MainWindow::carPopButton_clicked()
                 queueTopButton_clicked();
             }
         }
+    }
+}
+
+void MainWindow::querySpaceButton_clicked()
+{
+    bool flag = false;
+    for (int i = 0; i < 8; i++) {
+        if (spaceState[i] != nullptr && queryNumSpinBox->value()-1 == i) {
+            flag = true;
+            QDateTime exitTime = QDateTime::currentDateTime();
+            QString text = "车牌号:" + spaceState[i]->carnum + "\n";
+            text += "入库时间:" + spaceState[i]->entryTime.toString("yyyy/MM/dd hh:mm:ss") + '\n';
+            text += "当前时间" + exitTime.toString("yyyy/MM/dd hh:mm:ss") + '\n';\
+                qint64 totalSeconds = spaceState[i]->entryTime.secsTo(exitTime);
+            text += "计费规则：￥1/秒\n";
+            text += "停车共计费:￥" + QString::number(totalSeconds) + "\n";
+            qint64 hour = totalSeconds / 3600;
+            totalSeconds %= 3600;
+            qint64 minute = totalSeconds / 60;
+            totalSeconds %= 60;
+            qint64 second = totalSeconds;
+            text += "停车时长:" + QString::number(hour) + "时" + QString::number(minute) + "分" + QString::number(second) + "秒\n";
+            infoTextEdit->append("\n===============\n");
+            infoTextEdit->append(text);
+        }
+    }
+    if (!flag) {
+        infoTextEdit->append("\n===============\n");
+        infoTextEdit->append("该车位未停放车辆\n");
+    }
+}
+
+void MainWindow::queryNumButton_clicked()
+{
+    using std::cout;
+    using std::endl;
+    bool flag = false;
+    for (int i = 0; i < 8; i++) {
+        if (spaceState[i] != nullptr && spaceState[i]->carnum == queryTextEdit->text()) {
+            flag = true;
+            QDateTime exitTime = QDateTime::currentDateTime();
+            QString text = "车牌号:" + spaceState[i]->carnum + "\n";
+            text += "入库时间:" + spaceState[i]->entryTime.toString("yyyy/MM/dd hh:mm:ss") + '\n';
+            text += "当前时间" + exitTime.toString("yyyy/MM/dd hh:mm:ss") + '\n';\
+                qint64 totalSeconds = spaceState[i]->entryTime.secsTo(exitTime);
+            text += "计费规则：￥1/秒\n";
+            text += "停车共计费:￥" + QString::number(totalSeconds) + "\n";
+            qint64 hour = totalSeconds / 3600;
+            totalSeconds %= 3600;
+            qint64 minute = totalSeconds / 60;
+            totalSeconds %= 60;
+            qint64 second = totalSeconds;
+            text += "停车时长:" + QString::number(hour) + "时" + QString::number(minute) + "分" + QString::number(second) + "秒\n";
+            infoTextEdit->append("\n===============\n");
+            infoTextEdit->append(text);
+        }
+    }
+    if (!flag) {
+        infoTextEdit->append("\n===============\n");
+        infoTextEdit->append("未找到该车辆\n");
     }
 }
 

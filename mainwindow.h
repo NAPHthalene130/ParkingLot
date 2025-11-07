@@ -36,6 +36,10 @@ private:
     QLineEdit *carPopLineEdit;
     QLabel *spaceLeftLabel = new QLabel("剩余车位:2");
     QTextEdit *infoTextEdit;
+    QSpinBox *queryNumSpinBox;
+    QLineEdit *queryTextEdit;
+    QPushButton *querySpaceButton;
+    QPushButton *queryNumButton;
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -45,6 +49,8 @@ private slots:
     void randLisenceButton_clicked();
     void queueTopButton_clicked();
     void carPopButton_clicked();
+    void querySpaceButton_clicked();
+    void queryNumButton_clicked();
     void carButtonClicked(QString num);
 protected:
     //测试鼠标位置
