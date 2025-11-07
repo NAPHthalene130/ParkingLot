@@ -23,6 +23,7 @@
 #include <QSequentialAnimationGroup>
 #include <ctime>
 #include <QDateTime>
+#include <QTransform>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -316,11 +317,23 @@ void MainWindow::queueTopButton_clicked()
         animAB->setStartValue(queueTop->pos());
         animAB->setEndValue(QPoint(820, 600));
         group->addAnimation(animAB);
+        QObject::connect(animAB, &QSequentialAnimationGroup::finished,this,  [=]() {
+            delete queueTop->movie;
+            queueTop->movie = new QMovie(":/images/carGif_90.gif");
+            queueTop->carGifLabel->setMovie(queueTop->movie);
+            queueTop->movie->start();
+        });
         QPropertyAnimation *animBC = new QPropertyAnimation(queueTop, "pos");
         animBC->setDuration(500);
         animBC->setStartValue(QPoint(820,600));
         animBC->setEndValue(QPoint(820, 200));
         group->addAnimation(animBC);
+        QObject::connect(animBC, &QSequentialAnimationGroup::finished,this,  [=]() {
+            delete queueTop->movie;
+            queueTop->movie = new QMovie(":/images/carGif_180.gif");
+            queueTop->carGifLabel->setMovie(queueTop->movie);
+            queueTop->movie->start();
+        });
         QPropertyAnimation *animCD = new QPropertyAnimation(queueTop, "pos");
         animCD->setDuration((820-xPos));
         animCD->setStartValue(QPoint(820,200));
@@ -333,15 +346,22 @@ void MainWindow::queueTopButton_clicked()
         group->addAnimation(animDE);
         group->start();
         spaceState[target] = newCar;
+        newCar->spaceIndex = target;
         parkingSpareSpace--;
         newCar->entryTime = QDateTime::currentDateTime();
         spaceLeftLabel->setText("剩余车位:"+ QString::number(parkingSpareSpace));
         infoTextEdit->append("\n===============\n");
         infoTextEdit->append("车牌号:" + newCar->carnum + "入库成功\n" + "入库时间" + newCar->entryTime.toString("yyyy/MM/dd hh:mm:ss") + "\n");
+        newCar->raise();
         QObject::connect(group, &QSequentialAnimationGroup::finished,this,  [=]() {
+            newCar->isStop = true;
             if (carQueue.size() > 0) {
                 queueTopButton_clicked();
             }
+        });
+        connect(newCar, &QPushButton::clicked, this, [this, finalNum = newCar->carnum]() {
+            cout << "Car Clicked" << endl;
+            this->carButtonClicked(finalNum);
         });
     }
 }
@@ -386,6 +406,12 @@ void MainWindow::carPopButton_clicked()
     }
 }
 
+void MainWindow::carButtonClicked(QString num)
+{
+    carPopLineEdit->setText(num);
+    carPopButton_clicked();
+}
+
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
     QPoint relativePos = event->pos();
@@ -394,4 +420,5 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
     qDebug() <<"Local Position"
              << "X =" << x
              << "Y =" << y;
+    QMainWindow::mousePressEvent(event);
 }

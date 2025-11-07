@@ -5,8 +5,9 @@
 #include <QPoint>
 #include <qlabel.h>
 #include <QDateTime>
-
-class Car : public QWidget
+#include <QPushButton>
+#include <QTransform>
+class Car : public QPushButton
 {
 public:
     QString carnum;
@@ -16,7 +17,9 @@ public:
     void leaveParking(QWidget* widget);
     QDateTime entryTime;
     int index = 0;
-private:
+    int spaceIndex;
+    bool isStop = false;
+    void applyTransform(const QTransform &transform);
     QLabel *carNumLabel;
     QLabel *carGifLabel;
 };

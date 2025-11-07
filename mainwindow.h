@@ -45,6 +45,7 @@ private slots:
     void randLisenceButton_clicked();
     void queueTopButton_clicked();
     void carPopButton_clicked();
+    void carButtonClicked(QString num);
 protected:
     //测试鼠标位置
     void mousePressEvent(QMouseEvent *event) override;

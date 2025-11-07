@@ -2,5 +2,7 @@
     <qresource prefix="/">
         <file>images/img.png</file>
         <file>images/carGif.gif</file>
+        <file>images/carGif_180.gif</file>
+        <file>images/carGif_90.gif</file>
     </qresource>
 </RCC>

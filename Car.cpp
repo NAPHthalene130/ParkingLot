@@ -7,10 +7,8 @@
 #include <QMovie>
 #include <QVBoxLayout>
 #include <QSequentialAnimationGroup>
-#include <chrono>
-#include <iomanip>
 #include <ctime>
-
+#include <QTransform>
 Car::Car(QString num){
     using std::cout;
     using std::endl;
@@ -28,6 +26,10 @@ Car::Car(QString num){
         QVBoxLayout *carLay = new QVBoxLayout;
         carLay->addWidget(this->carNumLabel);
         carLay->addWidget(this->carGifLabel);
+        this->carGifLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
+        this->carNumLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
+        this->carGifLabel->setFocusPolicy(Qt::NoFocus);
+        this->carNumLabel->setFocusPolicy(Qt::NoFocus);
 
         this->setLayout(carLay);
         movie->start();
@@ -69,3 +71,4 @@ void Car::leaveParking(QWidget* widget)
                      this, &QWidget::deleteLater);
     group->start();
 }
+
